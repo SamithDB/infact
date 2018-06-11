@@ -44,7 +44,7 @@
             } else {
               req.session.cookie.expires = false;
             }
-        res.redirect('/');
+        res.redirect('/login');
     });
 
 	// =====================================
@@ -59,7 +59,7 @@
 	// process the signup form
 	app.post('/signup', passport.authenticate('local-signup', {
 		
-		successRedirect : '/fillprofile', // redirect to the secure home section
+		successRedirect : '/login', // redirect to the secure home section
 		failureRedirect : '/signup', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 

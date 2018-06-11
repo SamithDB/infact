@@ -58,7 +58,7 @@ module.exports = function(passport) {
             // we are checking to see if the user trying to login already exists
             
 
-            connection.query("SELECT * FROM login WHERE username = ?",[username], function(err, rows) {
+            connection.query("SELECT * FROM user WHERE username = ?",[username], function(err, rows) {
                 if (err)
                     return done(err);
                 if (rows.length) {
@@ -69,24 +69,16 @@ module.exports = function(passport) {
                         var newUserMysql = new Object();
                         newUserMysql.username = username;
                         newUserMysql.password = bcrypt.hashSync(password, null, null);  // use the generateHash function in our user model
+                        newUserMysql.name = req.body.name;
+                        newUserMysql.nic = req.body.nic;
                         
                         console.log("Connected!");
-                        var insertQuery = "INSERT INTO login ( username, password ) values (?,?)";
-                        connection.query(insertQuery,[newUserMysql.username, newUserMysql.password],function(err, rows) {
+                        var insertQuery = "INSERT INTO user ( username, password, name, nic ) values (?,?,?,?)";
+                        connection.query(insertQuery,[newUserMysql.username, newUserMysql.password, newUserMysql.name, newUserMysql.nic],function(err, rows) {
                         if (err) throw err;
-                        console.log("1 record inserted to login");
-                        newUserMysql.idlogin = rows.insertId;
-						
-							var insertQuery = "INSERT INTO employee ( fname, lname, login_idlogin, username ) values (?,?,?,?)";
-							connection.query(insertQuery,[req.body.fname, req.body.lname, newUserMysql.idlogin,newUserMysql.username],function(err, rows) {
-								if (err) throw err;
-								console.log("1 record inserted employee");
-							});
+                        console.log("1 record inserted to user");
 							
-                        console.log(req.body.fname);
-                        return done(null, newUserMysql);
-
-
+                        return done(null, newUserMysql,req.flash('loginMessage', 'User registered!'));
 
                     });
                 }else{return done(null, false, req.flash('signupMessage', 'Passwords not matched.'));}
